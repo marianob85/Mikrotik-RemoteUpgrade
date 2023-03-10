@@ -15,8 +15,9 @@
                 "-vv",
                 "--username", "update",
                 "--password", "update",
-                "--noop",
-                "192.168.1.24"
+                "192.168.1.24",
+                "--timeout", "20"
+                "--sshretries", "10"
             ]
         }
     ]

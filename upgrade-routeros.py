@@ -7,20 +7,18 @@ import re
 import time
 import getpass
 import packaging.version
-
+from multiping import multi_ping
 import paramiko
-import scp
 
 
 import argparse
 parser = argparse.ArgumentParser()
-parser.add_argument('-t', '--timeout',				help='SSH timeout in seconds, default: 10')
+parser.add_argument('-t', '--timeout',			type=int,	help='SSH timeout in seconds, default: 60')
 parser.add_argument('-s', '--sshstop',   action="store_true",	help='Stop upgrades of further devices if SSH fails on initial connection, default: false')
-parser.add_argument('-R', '--sshretries',			help='SSH retries, default: 3')
+parser.add_argument('-R', '--sshretries',		type=int,	help='SSH retries, default: 3')
 parser.add_argument('-r', '--reboot_timeout',			help='Timeout after reboot before upgrade considered failed, default: 180')
 parser.add_argument('-u', '--username',				help='Username for access to RouterOS, default: local username')
 parser.add_argument('-p', '--password',	required=True,				help='password for access to RouterOS, default:')
-parser.add_argument('-n', '--noop',      action="store_true",	help="Don't perform any actions, just report what will occur. Implies --verbose")
 parser.add_argument('-v', '--verbose',   action="count",	help='Verbose output')
 parser.add_argument('hosts', metavar='HOST', type=str, nargs='+', help='RouterOS host to upgrade')
 args = parser.parse_args()
@@ -35,11 +33,6 @@ class bcolors:
 	BOLD = '\033[1m'
 	UNDERLINE = '\033[4m'
 
-
-pingable = os.system("fping -q localhost")
-if pingable == 127:
-	print("fping is required to be able check for the RouterOS device connectivity after rebooting")
-	sys.exit(1)
 
 if args.username:
 	username = args.username
@@ -63,34 +56,14 @@ else:
 
 password = args.password
 
-if args.noop:
-	if not args.verbose:
-		args.verbose = 1
-
 if args.verbose:
 	print("Verbose output enabled")
 	print("Verbose level {}".format(args.verbose))
 	print("Username: '{}'".format(username))
 	print("Timeout: {} seconds".format(timeout))
-	if args.noop:
-		print("Dry run only. NOT performing any actions.")
 
 MikroTik_regex = re.compile('^ *([^:]*): (.*)')
 MikroTik_version_regex = re.compile('^([^ ]*)')
-
-
-# setup logging
-#paramiko.util.log_to_file("demo.log")
-
-
-# Define progress callback that prints the current percentage completed for the file with SCP
-def progress(filename, size, sent):
-	sys.stdout.write("%s\'s progress: %.2f%%   \r" % (filename, float(sent)/float(size)*100) )
-
-# Define reporthook that prints the current percentage completed for the file download
-def reporthook(chunknum, maxchunksize, totalsize):
-	sys.stdout.write("%i of %i progress: %.2f%%   \r" % ((chunknum*maxchunksize), totalsize, float(chunknum*maxchunksize)/float(totalsize)*100) )
-
 
 for hostname in args.hosts:
 	if sys.stdout.isatty():
@@ -181,7 +154,7 @@ for hostname in args.hosts:
 
 	# Check if newer version
 	SSHClient.exec_command('/system package update check-for-updates once')
-	time.sleep(10)
+	time.sleep(3)
 	stdin, stdout, stderr = SSHClient.exec_command('/system package update print')
 	
 	for line in stdout:
@@ -208,16 +181,14 @@ for hostname in args.hosts:
 		stdin, stdout, stderr = SSHClient.exec_command('/system package update install')
 
 		reboot_time = time.time()
-
-		# Give the device at least 5 seconds to reboot before starting to check whether it's alive
-		if not args.noop:
-			time.sleep(10)
+		time.sleep(5)
 
 		host_up = False
 		timeout = time.time() + reboot_timeout
 		while time.time() < timeout:
-			pingable = os.system("fping -q " + hostname + " 2>/dev/null")
-			if pingable == 0:
+			#pingable = os.system("fping -q " + hostname + " 2>/dev/null")
+			responses, no_responses = multi_ping([hostname], timeout=1, retry=1)
+			if not no_responses:
 				host_up = True
 				break
 			if sys.stdout.isatty():
@@ -291,7 +262,8 @@ for hostname in args.hosts:
 			if m:
 				version = m.group(1)
 			CurVersion = packaging.version.parse(version)
-			if (CurVersion < latest_version):
+			LastVersion = packaging.version.parse(latest_version)
+			if (CurVersion < LastVersion):
 				if sys.stdout.isatty():
 					print(bcolors.FAIL, end='')
 				print("ERROR: Upgrade of {} did not occur, current RouterOS version {}. Updates to ALL FURTHER devices cancelled!".format(hostname,version))
