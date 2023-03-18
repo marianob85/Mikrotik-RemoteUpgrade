@@ -83,7 +83,7 @@ class RouterOsUpgrade:
             _, no_responses = multi_ping([hostname], timeout=10, retry=2)
             if not no_responses:
                 return True, time.time() - reboot_time
-            print('\r{:.0f} seconds since reboot...'.format(time.time() - reboot_time))
+            print('{:.0f} seconds since reboot...\n'.format(time.time() - reboot_time))
         return False
 
     def makeOSUpgrade(self, hostname):
