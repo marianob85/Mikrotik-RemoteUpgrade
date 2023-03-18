@@ -1,3 +1,8 @@
-paramiko
-packaging
-multiPing
+paramiko==3.1.0
+packaging==23.0
+multiPing==1.1.2
+bcrypt==4.0.1
+cffi==1.15.1
+cryptography==39.0.2
+pycparser==2.21
+pynacl==1.5.0
