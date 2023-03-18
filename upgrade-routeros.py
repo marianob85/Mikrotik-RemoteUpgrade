@@ -1,7 +1,7 @@
 import argparse
 import RouterOS
 
-# https://github.com/andrewradke/MikroTik-upgrade/blob/master/upgrade-routeros.py
+# Based on: https://github.com/andrewradke/MikroTik-upgrade/blob/master/upgrade-routeros.py
 
 if __name__ == '__main__':
 

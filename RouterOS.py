@@ -147,14 +147,14 @@ class RouterOsUpgrade:
                 else:
                     print("{} RouterOS successfully upgraded. Version now {}".format(hostname, mtResources.version))
                     return True, mtResources.version
-        except:
+        except Exception as err:
+            print("{} RouterOS Unknown exception {}".format(err))
             if SSHClient: 
                 SSHClient.close()
                 return False, None
         finally:
             if SSHClient: 
                 SSHClient.close()
-        return True
 
     def makeFirmwareUpdate(self, hostname):
         if self.verbose:
