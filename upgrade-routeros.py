@@ -32,6 +32,6 @@ if __name__ == '__main__':
 
         upgradeStatus[hostname] = (routerOsStatus, routerOsVersion, firmwareStatus, firmwareVersion)
 
-    print("\n\n\n{:<16}: {:^12}: {:^12}".format("Hostname", "RouterOS", "Firmware"))
+    print("\n\n\n{:<16}: {:^20}: {:^12}".format("Hostname", "RouterOS", "Firmware"))
     for k, v in upgradeStatus.items():
-        print("{:<16}: {:<6} {:>4} : {:<6} {:>4}".format(k, str(v[0]), str(v[1]), str(v[2]), str(v[3])))
+        print("{:<16}: {:<6} {:>12} : {:<6} {:>4}".format(k, str(v[0]), str(v[1]), str(v[2]), str(v[3])))
