@@ -15,7 +15,7 @@ if __name__ == '__main__':
     parser.add_argument('hosts', metavar='HOST', type=str, nargs='+', help='RouterOS host to upgrade')
     args = parser.parse_args()
 
-    routerOsUpgrade = RouterOS.RouterOsUpgrade(timeout=args.timeout, sshretries=args.timeout, reboot_timeout=args.reboot_timeout,
+    routerOsUpgrade = RouterOS.RouterOsUpgrade(timeout=args.timeout, sshretries=args.sshretries, reboot_timeout=args.reboot_timeout,
                                                username=args.username, password=args.password, verbose=args.verbose)
 
     upgradeStatus = {}
@@ -35,3 +35,8 @@ if __name__ == '__main__':
     print("\n\n\n{:<16}: {:^20}: {:^12}".format("Hostname", "RouterOS", "Firmware"))
     for k, v in upgradeStatus.items():
         print("{:<16}: {:<6} {:>12} : {:<6} {:>4}".format(k, str(v[0]), str(v[1]), str(v[2]), str(v[3])))
+
+    for k, v in upgradeStatus.items():
+        if v[0] == False or v[2] == False:
+            exit(1)
+    exit(0)

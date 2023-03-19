@@ -16,9 +16,9 @@
                 "--username", "update",
                 "--password", "update",
                 "--timeout", "10",
-                "--sshretries", "5",
+                "--sshretries", "0",
                 "--reboot_timeout","360",
-                "192.168.10.7"
+                "192.168.10.10"
             ]
         }
     ]
