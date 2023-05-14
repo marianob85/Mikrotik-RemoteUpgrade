@@ -1,5 +1,6 @@
 import argparse
 import RouterOS
+import time
 
 # Based on: https://github.com/andrewradke/MikroTik-upgrade/blob/master/upgrade-routeros.py
 
@@ -31,6 +32,8 @@ if __name__ == '__main__':
             firmwareVersion = None
 
         upgradeStatus[hostname] = (routerOsStatus, routerOsVersion, firmwareStatus, firmwareVersion)
+
+        time.sleep(60)
 
     print("\n\n\n{:<16}: {:^20}: {:^12}".format("Hostname", "RouterOS", "Firmware"))
     for k, v in upgradeStatus.items():
