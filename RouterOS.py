@@ -60,12 +60,15 @@ class RouterOsUpgrade:
         return SSHClient
 
     def checkForNewVersion(self, sshclient):
-        sshclient.exec_command('/system package update check-for-updates once')
-        time.sleep(3)
-        _, stdout, _ = sshclient.exec_command('/system package update print')
-        mtUpgradeInfo = RouterOSCommand(stdout, attributes=['installed_version', 'latest_version', 'status'], verbose=self.verbose)
-        if mtUpgradeInfo.latest_version:
-            return mtUpgradeInfo
+        retries = 1
+        while retries:
+            retries -= 1
+            sshclient.exec_command('/system package update check-for-updates once')
+            time.sleep(10)
+            _, stdout, _ = sshclient.exec_command('/system package update print')
+            mtUpgradeInfo = RouterOSCommand(stdout, attributes=['installed_version', 'latest_version', 'status'], verbose=self.verbose)
+            if mtUpgradeInfo.latest_version:
+                return mtUpgradeInfo
         return None
 
     def mapVersion(self, version):
