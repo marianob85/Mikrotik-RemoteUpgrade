@@ -82,7 +82,11 @@ class RouterOsUpgrade:
         reboot_time = time.time()
         timeout = time.time() + self.reboot_timeout
         while time.time() < timeout:
-            _, no_responses = multi_ping([hostname], timeout=10, retry=2)
+            no_responses = None
+            try:
+                _, no_responses = multi_ping([hostname], timeout=10, retry=2)
+            except Exception as err:
+                pass
             if not no_responses:
                 return True, time.time() - reboot_time
             print('{:.0f} seconds since reboot...\n'.format(time.time() - reboot_time))
