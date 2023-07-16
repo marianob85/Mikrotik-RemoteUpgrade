@@ -125,7 +125,7 @@ class RouterOsUpgrade:
             print("RouterOS version from {} to {}".format(mtUpgradeInfo.installed_version, mtUpgradeInfo.latest_version))
             SSHClient.exec_command('/system package update install')
 
-            time.sleep(30)
+            time.sleep(360)
             host_up, reboot_time = self.waitForResponse(hostname)
             if not host_up:
                 print("ERROR: {} has NOT come back online within {} seconds. ".format(hostname, self.reboot_timeout))
@@ -191,7 +191,7 @@ class RouterOsUpgrade:
             time.sleep(15)
             print("Rebooting {}".format(hostname))
             SSHClient.exec_command('/system reboot')
-            time.sleep(5)
+            time.sleep(240)
             host_up, reboot_time = self.waitForResponse(hostname)
             if not host_up:
                 print("ERROR: {} has NOT come back online within {} seconds. ".format(hostname, self.reboot_timeout))
