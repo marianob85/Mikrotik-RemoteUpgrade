@@ -153,8 +153,8 @@ class RouterOsUpgrade:
                 else:
                     print("{} RouterOS successfully upgraded. Version now {}".format(hostname, mtResources.version))
                     return True, mtResources.version
-        except Exception as err:
-            print("{} RouterOS Unknown exception {}".format(err))
+        except Exception:
+            print("RouterOS Unknown exception")
             if SSHClient: 
                 SSHClient.close()
                 return False, None
